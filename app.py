@@ -87,19 +87,43 @@ def finalizar_compra():
     conexion.commit()
     cursor.close()
     conexion.close()
-    msg = f"🔔 *¡NUEVA VENTA REGISTRADA! (Web)*\n\n📄 *Pedido:* #{id_venta}\n👤 *Cliente:* {nombre} ({telefono})\n"
-    msg += f"💳 *Método de Pago:* {metodo_pago}\n\n🛒 *Periféricos Solicitados:*\n{texto_productos_whatsapp}\n💰 *Total Neto:* ${total:.2f}\n\n⚙️ _Verificar abono._"
+       # ========================================================
+    # 4. DISPARAR NOTIFICACIÓN AUTOMÁTICA A WHATSAPP (JSON)
+    # ========================================================
+    msg = f"🔔 *¡NUEVA VENTA REGISTRADA! (Web)*\n\n"
+    msg += f"📄 *Pedido:* #{id_venta}\n"
+    msg += f"👤 *Cliente:* {nombre} ({telefono})\n"
+    msg += f"💳 *Método de Pago:* {metodo_pago}\n\n"
+    msg += f"🛒 *Periféricos Solicitados:*\n{texto_productos_whatsapp}\n"
+    msg += f"💰 *Total Neto:* ${total:.2f}\n\n"
+    msg += f"⚙️ _Por favor, verifique el abono para preparar el despacho._"
+
+    # Credenciales directas de tu cuenta
+    wp_phone = "59169825692"
+    wp_token = "r6vrs04yzamxzlpx"
+    wp_instance = "instance193038"
+
+    # Cambiamos el endpoint al envío nativo de JSON
+    url_api = f"https://api.ultramsg.com/{wp_instance}/messages/chat"
+
+    # Estructura limpia que Render NO va a bloquear
+    payload = {
+        "token": wp_token,
+        "to": wp_phone,
+        "body": msg
+    }
     
-    wp_phone, wp_token, wp_instance = "59169825692", "r6vrs04yzamxzlpx", "instance193038"
-    url_api = f"https://ultramsg.com{wp_instance}/messages/chat"
-    payload = f"token={wp_token}&to={wp_phone}&body={requests.utils.quote(msg)}"
-    headers = {'content-type': 'application/x-www-form-urlencoded'}
+    headers = {'content-type': 'application/json'} # <-- Le avisamos al servidor que va protegido en JSON
+
     try:
-        requests.post(url_api, data=payload, headers=headers, timeout=12)
+        # Enviamos usando json=payload en vez de data=payload
+        requests.post(url_api, json=payload, headers=headers, timeout=12)
     except Exception:
         pass
+        
     session.pop('carrito', None)
     return render_template('exito.html', id_venta=id_venta)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
