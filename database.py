@@ -1,10 +1,6 @@
-import mysql.connector
+import sqlite3
 
 def obtener_conexion():
-    """Establece la conexión con la base de datos de XAMPP"""
-    return mysql.connector.connect(
-        host="localhost",
-        user="root",        # Usuario por defecto de XAMPP
-        password="",        # Contraseña por defecto de XAMPP (vacía)
-        database="tienda_perifericos"
-    )
+    conexion = sqlite3.connect("tienda.db")
+    conexion.row_factory = sqlite3.Row
+    return conexion
