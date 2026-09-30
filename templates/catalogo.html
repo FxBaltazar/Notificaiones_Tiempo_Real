@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>ROG Store - Periféricos</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <header>
+        <h1>ROG <span>STORE</span></h1>
+        <a href="{{ url_for('ver_carrito') }}" class="btn-carrito">🛒 Ver Carrito</a>
+    </header>
+
+    <div class="container">
+        <h2>Catálogo de Periféricos Premium</h2>
+        
+        <div class="grid-productos">
+            {% for p in productos %}
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title">{{ p.nombre }}</h3>
+                    <p class="card-desc">{{ p.descripcion }}</p>
+                    <div class="card-footer">
+                        <span class="precio">${{ p.precio }}</span>
+                        <form action="{{ url_for('agregar_al_carrito', producto_id=p.id) }}" method="POST">
+                            <input type="hidden" name="cantidad" value="1">
+                            <button type="submit" class="btn-add">Añadir</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>
